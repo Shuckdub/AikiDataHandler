@@ -1,3 +1,5 @@
+import java.io.File;
+import java.io.IOException;
 import java.util.Date;
 import java.util.Scanner;
 
@@ -17,33 +19,46 @@ public class DataHandler{
     String event = "";
     Date time = null;
     String url = "";
-    static Scanner sc = new Scanner(System.in);
+    Scanner sc;
     static Printer p = new Printer();
-    public static void main(String[] args) {
-        DataHandler d = new DataHandler();
-        while(sc.hasNext()){
-            String lines = sc.nextLine();
-            if(lines.length() > 60) {
-                p.printTitle();
-                d.changeParticipant(lines);
-                while(sc.hasNext()){
-                    String newParticipant = lines.replaceAll(Regex.regexIt("participant"), "");
-                    if(newParticipant.length() > 59) {
-                        d.changeParticipant(newParticipant);
+
+
+    public void startTheDataHandler(File file, boolean firstFile, boolean lastFile){
+        try{
+            sc = new Scanner(file);
+            while(sc.hasNext()){
+                String lines = sc.nextLine();
+                if(lines.length() > 60) {
+                    if(firstFile){
+                        p.printTitle();
                     }
-                    lines = sc.nextLine();
-                    if(!lines.matches(".*collections.*")){
-                        d.theParticipantsActivity(lines);
-                    } else if (lines.matches(".*collections.*")){
-                        d.ending();
-                    } else {
-                        continue;
+                    changeParticipant(lines);
+                    while(sc.hasNext()){
+                        String newParticipant = lines.replaceAll(Regex.regexIt("participant"), "");
+                        if(newParticipant.length() > 59) {
+                            changeParticipant(newParticipant);
+                        }
+                        lines = sc.nextLine();
+                        if(!lines.matches(".*collections.*")){
+                            theParticipantsActivity(lines);
+                        } else if (lines.matches(".*collections.*")){
+                            endOfParticipan();
+                        } else {
+                            continue;
+                        }
                     }
                 }
             }
+            if(lastFile){
+                p.printItAll();
+            }
+            sc.close();
+        } catch (IOException e){
+            System.out.println("An error occurred.");
+            e.printStackTrace();
         }
-        sc.close();
     }
+
     /**
      * This method is used to sort out what the participant did
      * at the given time. The method does this by scanning the lines
@@ -129,7 +144,7 @@ public class DataHandler{
     /**
      * This marks the end of the dataset for the participant.
      */
-    private void ending(){
+    private void endOfParticipan(){
         p.printEnding(participant, "", "end", "", "");
     }
 
