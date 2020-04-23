@@ -180,6 +180,7 @@ public class DataHandler{
     private void enabled(String lines){
         event = lines.replaceAll(Regex.regexIt("event"), "").substring(0, 7);
         String value = lines.replaceAll(Regex.regexIt("event"), "").substring(7);
+        url = "";
         p.printer(participant, time, event, url, value);
     }
 

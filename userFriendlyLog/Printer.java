@@ -12,15 +12,6 @@ public class Printer {
         sb = new StringBuilder();
     }
 
-    public void printer(String participant, String time, String event, String url, String value){
-        sb.append(participant + "," + time + "," + event + "," + url + "," + value + "\n");
-    }
-
-    public String timePrinter(Date times){
-        DateFormat df = new SimpleDateFormat("dd/MM/yy HH:mm:ss");
-        return df.format(times);
-    }
-
     public void printTitle(){
         String titlesOfTheColoumns = "Participant,Timestamp,event,url,value";
         sb.append(titlesOfTheColoumns + "\n");
@@ -30,17 +21,17 @@ public class Printer {
         sb.append("\n");
     }
 
-    public void splitPrints(String nextLines){
+    public void addToPrinter(String nextLines){
         sb.append(nextLines + "\n");
     }
 
-    public void splitItAll(String participant){
+    public void printItAll(String placement, String fileName){
         try {
-            File file = new File("./output/"+ participant +".csv");
+            File file = new File("./"+ placement +"/"+ fileName +".csv");
             int i = 1;
             while(true){
                 if(file.exists()){
-                    file = new File("./output/"+ participant + "-x-" + i + ".csv");
+                    file = new File("./"+ placement +"/"+ fileName + "-x-" + i + ".csv");
                     i++;
                     continue;
                 }
