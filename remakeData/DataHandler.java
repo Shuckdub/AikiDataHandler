@@ -23,15 +23,12 @@ public class DataHandler{
     static Printer p = new Printer();
 
 
-    public void startTheDataHandler(File file, boolean firstFile, boolean lastFile){
+    public void startTheDataHandler(File file, boolean lastFile){
         try{
             sc = new Scanner(file);
             while(sc.hasNext()){
                 String lines = sc.nextLine();
                 if(lines.length() > 60) {
-                    if(firstFile){
-                        p.printTitle();
-                    }
                     changeParticipant(lines);
                     while(sc.hasNext()){
                         String newParticipant = lines.replaceAll(Regex.regexIt("participant"), "");
@@ -42,7 +39,7 @@ public class DataHandler{
                         if(!lines.matches(".*collections.*")){
                             theParticipantsActivity(lines);
                         } else if (lines.matches(".*collections.*")){
-                            endOfParticipan();
+                            // endOfParticipan();
                         } else {
                             continue;
                         }
@@ -141,12 +138,12 @@ public class DataHandler{
         participant = lines.replaceAll(Regex.regexIt("participant"), "");
     }
 
-    /**
-     * This marks the end of the dataset for the participant.
-     */
-    private void endOfParticipan(){
-        p.printEnding(participant, "", "end", "", "");
-    }
+    // /**
+    //  * This marks the end of the dataset for the participant.
+    //  */
+    // private void endOfParticipan(){
+    //     p.printEnding(new String[]{participant, "", "end", "", ""});
+    // }
 
     /**
      * This method prepares the data for the Printer class,
@@ -158,10 +155,10 @@ public class DataHandler{
         Date timeout = timeConverter(lines.replaceAll(Regex.regexIt("time"), ""));
         if(time.compareTo(timeout) < 0) {
             event = "timeout-on";
-            p.printer(participant, time, event, url, p.timePrinter(timeout));
+            p.printer(new String[]{participant, p.timePrinter(time), event, url, p.timePrinter(timeout)});
         } else {
             event = "timeout-off";
-            p.printer(participant, time, event, url, p.timePrinter(timeout));
+            p.printer(new String[]{participant, p.timePrinter(time), event, url, p.timePrinter(timeout)});
         }
     }
 
@@ -181,7 +178,7 @@ public class DataHandler{
         event = lines.replaceAll(Regex.regexIt("event"), "").substring(0, 7);
         String value = lines.replaceAll(Regex.regexIt("event"), "").substring(7);
         url = "";
-        p.printer(participant, time, event, url, value);
+        p.printer(new String[]{participant, p.timePrinter(time), event, url, value});
     }
 
     /**
@@ -193,7 +190,7 @@ public class DataHandler{
         String value = lines.replaceAll(Regex.regexIt("event"), "");
         event = "exercisestatus";
         url = "";
-        p.printer(participant,time,event,url,value);
+        p.printer(new String[]{participant, p.timePrinter(time), event, url, value});
     }
 
     /**
@@ -205,7 +202,7 @@ public class DataHandler{
         event = lines.replaceAll(Regex.regexIt("event"), "");
         url = "";
         String value = lines.replaceAll(Regex.regexIt("time"), "");
-        p.printer(participant, time, event, url, value);
+        p.printer(new String[]{participant, p.timePrinter(time), event, url, value});
     }
 
     /**
@@ -216,7 +213,7 @@ public class DataHandler{
     private void prepIntercepts(String lines){
         url = lines.replaceAll(Regex.regexIt("url"), "");
         String value = lines.replaceAll(Regex.regexIt("time"), "");
-        p.printer(participant, time, event, url, value);
+        p.printer(new String[]{participant, p.timePrinter(time), event, url, value});
     }
 
     /**
@@ -227,7 +224,7 @@ public class DataHandler{
     private void prepBlockedUrls(String lines){
         url = lines.replaceAll(Regex.regexIt("url"), "");
         url = url.substring(8);
-        p.printer(participant, time, event, url, "");
+        p.printer(new String[]{participant, p.timePrinter(time), event, url, ""});
     }
     
     /**
@@ -238,6 +235,6 @@ public class DataHandler{
     private void closedTheInterception(){
         event = "intercepted";
         url = "";
-        p.printer(participant, time, event, url, "closed");
+        p.printer(new String[]{participant, p.timePrinter(time), event, url, "closed"});
     }
 }

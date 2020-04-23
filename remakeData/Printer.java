@@ -3,17 +3,18 @@ import java.io.File;
 import java.io.FileWriter;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 
 public class Printer {
-    private StringBuilder sb;
+    private ArrayList<String[]> sb;
 
     public Printer(){
-        sb = new StringBuilder();
+        sb = new ArrayList<>();
     }
 
-    public void printer(String participant, Date time, String event, String url, String value){
-        sb.append(participant + "," + timePrinter(time) + "," + event + "," + url + "," + value + "\n");
+    public void printer(String[] data){
+        sb.add(data);
     }
 
     public String timePrinter(Date times){
@@ -21,19 +22,20 @@ public class Printer {
         return df.format(times);
     }
 
-    public void printTitle(){
-        String titlesOfTheColoumns = "Participant,Timestamp,event,url,value";
-        sb.append(titlesOfTheColoumns + "\n");
-    }
-
-    public void printEnding(String participant, String time, String event, String url, String value){
-        sb.append(participant + "," + time + "," + event + "," + url + "," + value + "\n");
+    public void printEnding(String[] data){
+        sb.add(data);
     }
 
     public void printItAll(){
         try {
             File file = new File("./output/clean.csv");
             int i = 1;
+            sortItAll();
+            StringBuilder s = new StringBuilder();
+            s.append("Participant,Timestamp,event,url,value" + "\n");
+            for (String[] strings : sb) {
+                s.append(String.join(",",strings) + "\n");
+            }
             while(true){
                 if(file.exists()){
                     file = new File("./output/clean" + i + ".csv");
@@ -42,16 +44,20 @@ public class Printer {
                 }
                 FileWriter out = new FileWriter(file.getAbsolutePath());
                 BufferedWriter bw = new BufferedWriter(out);
-                bw.write(sb.toString());
+                bw.write(s.toString());
 
                 bw.close();
 
-                sb.setLength(0);
+                sb.clear();
                 break;
             }
         } catch (Exception e) {
-            //TODO: handle exception
+            System.out.println("Exception happened: ");
+            e.printStackTrace();
         }
     }
 
+    private void sortItAll(){
+        sb.sort((o1, o2) -> o1[0].compareTo(o2[0]));
+    }
 }
