@@ -7,14 +7,14 @@ import java.util.ArrayList;
 import java.util.Date;
 
 public class Printer {
-    private ArrayList<String[]> sb;
+    private ArrayList<String[]> al;
 
     public Printer(){
-        sb = new ArrayList<>();
+        al = new ArrayList<>();
     }
 
     public void printer(String[] data){
-        sb.add(data);
+        al.add(data);
     }
 
     public String timePrinter(Date times){
@@ -23,7 +23,7 @@ public class Printer {
     }
 
     public void printEnding(String[] data){
-        sb.add(data);
+        al.add(data);
     }
 
     public void printItAll(){
@@ -33,7 +33,7 @@ public class Printer {
             sortItAll();
             StringBuilder s = new StringBuilder();
             s.append("Participant,Timestamp,event,url,value" + "\n");
-            for (String[] strings : sb) {
+            for (String[] strings : al) {
                 s.append(String.join(",",strings) + "\n");
             }
             while(true){
@@ -48,7 +48,7 @@ public class Printer {
 
                 bw.close();
 
-                sb.clear();
+                al.clear();
                 break;
             }
         } catch (Exception e) {
@@ -58,6 +58,6 @@ public class Printer {
     }
 
     private void sortItAll(){
-        sb.sort((o1, o2) -> o1[0].compareTo(o2[0]));
+        al.sort((o1, o2) -> o1[0].compareTo(o2[0]));
     }
 }

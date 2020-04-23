@@ -12,17 +12,17 @@ public class Printer {
         sb = new StringBuilder();
     }
 
-    public void printTitle(){
-        String titlesOfTheColoumns = "Participant,Timestamp,event,url,value";
-        sb.append(titlesOfTheColoumns + "\n");
-    }
-
-    public void sessionStartEnd(){
-        sb.append("\n");
+    public void sessionStart(){
+        sb.append("Beginning of the session" + "\n");
     }
 
     public void addToPrinter(String nextLines){
         sb.append(nextLines + "\n");
+    }
+
+    public void test(){
+        System.out.println(sb.toString());
+        sb.setLength(0);
     }
 
     public void printItAll(String placement, String fileName){
@@ -46,7 +46,8 @@ public class Printer {
             }
             sb.setLength(0);
         } catch (Exception e) {
-            //TODO: handle exception
+            System.out.println("Execption occured:");
+            e.printStackTrace();
         }
     }
 

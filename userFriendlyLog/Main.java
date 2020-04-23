@@ -5,9 +5,9 @@ import java.util.List;
 public class Main {
     public static void main(String[] args){
         Testing t = new Testing();
-        t.firstGetEachParticipant();
+        // t.firstGetEachParticipant();
 
         Sessions s = new Sessions();
-        // s.covertEachParticipantIntoSessions();
+        s.covertEachParticipantIntoSessions();
     }
 }

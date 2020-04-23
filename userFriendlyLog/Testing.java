@@ -28,12 +28,14 @@ public class Testing {
             String placement = "output";
             Scanner sc = new Scanner(file);
             String title = sc.nextLine();
+        
             ArrayList<String[]> participantData = new ArrayList<>();
             while(sc.hasNext()){
                 participantData.add(sc.nextLine().split(","));
                                           
             }
             sc.close();  
+
             ArrayList<String[]> tempList = new ArrayList<>();
             for(int i = 0 ; i < participantData.size()-1; i++){
                 if(participantData.get(i)[0].equals(participantData.get(i+1)[0])){
@@ -44,7 +46,9 @@ public class Testing {
                     tempList.clear();
                 }
             }
+
             endOfThisParticipant(tempList, placement);
+            
         } catch (IOException e) {
             System.out.println("Execption occured:");
             e.printStackTrace();
@@ -59,31 +63,7 @@ public class Testing {
     private void prepareToPrint(ArrayList<String[]> participantData, String placement){
         for (String[] data : participantData) {
             p.addToPrinter(String.join(",", data));
-            String print = String.join(",", data);
         }
         p.printItAll(placement,participantData.get(0)[0]);
     }
 }
-
-// while(sc.hasNext()){
-//     String lines = sc.nextLine();
-//     String[] linesArray = lines.split(",");
-//     if(sc.hasNext()){
-//         String nextLine = sc.nextLine();
-//         String[] nextLineArray = nextLine.split(",");
-//         if(!(nextLineArray[0].equals(linesArray[0]))){
-//             endOfThisParticipant(participantData, linesArray, placement);
-//             participantData.clear();
-//             if(nextLineArray[2].equals("end")){
-//                 endOfThisParticipant(participantData, nextLineArray, placement);
-//                 participantData.clear();
-//             }
-//             break;
-//         } 
-//         participantData.add(nextLineArray);
-//     } else{
-//         endOfThisParticipant(participantData, linesArray, placement);
-//         participantData.clear();
-//     }                        
-//     participantData.add(linesArray);
-// }

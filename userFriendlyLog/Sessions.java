@@ -1,6 +1,7 @@
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -11,7 +12,10 @@ public class Sessions {
 
     Map<String,Integer> lastInterception = new TreeMap<>();
     Map<String,Integer> currentInterception = new TreeMap<>();
-    Scanner sc;
+    ArrayList<String[]> data;
+    int lastSession = 0;
+
+    Printer p = new Printer();
 
     public void covertEachParticipantIntoSessions(){
         final File folder = new File("./output");
@@ -27,34 +31,43 @@ public class Sessions {
 
     public void createSessions(File file){
         try {
-            sc = new Scanner(file);
+            Scanner sc = new Scanner(file);
             String nextLine = "";
+
+            data = new ArrayList<>();
             while(sc.hasNext()){
-                String line = sc.nextLine();
-                String[] lineArray = line.split(",");
+                data.add(sc.nextLine().split(","));                    
+            }
+            sc.close();
+            
+            int i = 0;
+            boolean first = true;
+            while(i < data.size()){
+                String[] lineArray = data.get(i);
+                
                 if(lineArray[2].equals("intercepts")){
-                    System.out.println();
-                    System.out.println("Begning of Session");
-                    System.out.println(lineArray[0]);
-                    System.out.println(lineArray[1]);
-                    //Where is the user headed?
-                    nextLine = workTheData(nextLine, lineArray);
 
+                    p.sessionStart();
+
+                    i = whatAreTheIntercepts(i, lineArray);
+                    
                     if(currentInterception.isEmpty()){
-                        System.out.println("The user is going to " + lineArray[3] + " first visit.");
-                        continue;
+                        p.addToPrinter("The user went to " + lineArray[3] + " for the first time.");
+                        i++;
                     } else {
-                        whereIsTheUserHeaded(nextLine,lineArray);
+                        whereIsTheUserHeaded();
                     }
+                    
+                    whatHappenedInTheSession(i);
+                    
+                    resetForTheNextSession();
 
-                    resetForTheNextSession(nextLine);
-                    //Found the answer
-
-                    System.out.println("The end of the session");
+                    p.test();
+                
+                } else{
+                    i++;
                 }
             }
-            
-            sc.close();
             
         } catch (IOException e) {
             System.out.println("Execption occured:");
@@ -63,52 +76,88 @@ public class Sessions {
 
     }
 
-    private void whereIsTheUserHeaded(String nextLine, String[] lineArray ){        
+    private void whereIsTheUserHeaded(){        
         if(lastInterception.keySet().equals(currentInterception.keySet())){
             for (Map.Entry<String,Integer> lastInter : lastInterception.entrySet()) {
                 if(currentInterception.containsKey(lastInter.getKey())){
                     int last = lastInter.getValue();
                     int current = currentInterception.get(lastInter.getKey());
                     if(last < current){
-                        System.out.println("The user is going to " + lastInter.getKey());
+                        p.addToPrinter("The user went to  " + lastInter.getKey());
                     }
                 }
             }    
         } else{
             for (Map.Entry<String,Integer> lastInter : currentInterception.entrySet()) {
                 if(!(lastInterception.containsKey(lastInter.getKey()))){
-                    System.out.println("The user is going to " + lastInter.getKey() + " first visit.");
+                    p.addToPrinter("The user went to " + lastInter.getKey() + " first visit.");
                 }
             }
         }
     }
 
-    private String workTheData(String nextLine, String[] lineArray){
+    private int whatAreTheIntercepts(int i, String[] lineArray){
         if(lastInterception.isEmpty()){
             lastInterception.put(lineArray[3],Integer.parseInt(lineArray[4]));
         } else{
             currentInterception.put(lineArray[3],Integer.parseInt(lineArray[4]));
-            while(sc.hasNext()){
-                nextLine = sc.nextLine();
-                String[] nextLineArray = nextLine.split(",");
+            while(i < data.size()){
+                i++;
+                String[] nextLineArray = data.get(i);
                 if(nextLineArray[1].equals(lineArray[1])){
                     currentInterception.put(nextLineArray[3],Integer.parseInt(nextLineArray[4]));
-                    System.out.println(nextLineArray[1]);
+                    p.addToPrinter(nextLineArray[1]);
                 } else{
-                    return nextLine;
+                    return i;
                 }
             }
         }
-        return nextLine;
+        return i++;
     }
 
-    private void resetForTheNextSession(String nextLine){
-        lastInterception.clear();
+    private void whatHappenedInTheSession(int i){
+        boolean exercisestatusFound = false;
+
+        while(i < data.size()){
+            
+            String[] nextLineArray = data.get(i);
+            
+            if(nextLineArray[2].equals("zeeguu")){
+                if(lastSession==0){
+                    lastSession = Integer.parseInt(nextLineArray[4]);
+                    p.addToPrinter("Length of session " + lastSession);
+                } else{
+                    int currentSession = Integer.parseInt(nextLineArray[4]);
+                    currentSession = currentSession-lastSession;
+                    p.addToPrinter("Length of session " + currentSession);
+                    lastSession = Integer.parseInt(nextLineArray[4]);
+                    
+                }
+
+            } else if(nextLineArray[2].matches("timeout.*")){
+                p.addToPrinter("timeout " + nextLineArray[4]);
+
+            } else if(nextLineArray[2].equals("exercisestatus")){
+                p.addToPrinter(nextLineArray[4]);
+                exercisestatusFound = true;
+
+            } else {
+                if(exercisestatusFound){
+                    break;
+                } else {
+                    String[] interruption = data.get(i-1);
+                    interruption[2] = "Exercise-Interrupted"; 
+                    p.addToPrinter(interruption[2]);
+                    break;
+                }
+            }
+            i++;
+        }
+    }
+
+    private void resetForTheNextSession(){
         lastInterception.putAll(currentInterception);
         currentInterception.clear();
-        
-        if(nextLine.split(",")[2].equals("intercepts")){
-            currentInterception.put(nextLine.split(",")[3],Integer.parseInt(nextLine.split(",")[4]));
-        }
+        p.addToPrinter("The end of the session");
     }
 }
