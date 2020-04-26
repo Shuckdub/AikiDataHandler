@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.Scanner;
 import java.util.TreeMap;
 
-public class Testing {
+public class Participants {
 
     Printer p = new Printer();
 
@@ -46,7 +46,7 @@ public class Testing {
                     tempList.clear();
                 }
             }
-
+            tempList.add(participantData.get(participantData.size()-1));
             endOfThisParticipant(tempList, placement);
             
         } catch (IOException e) {

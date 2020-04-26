@@ -72,7 +72,7 @@ public class DataHandler{
                 exerciseSuccessOrFailure(lines);
             } else {
                 lines = sc.nextLine().toLowerCase();
-                if(lines.matches(".*zeeguu.*") || lines.matches(".*exerciseduration.*") ){
+                if(lines.matches(".*zeeguu.*") || lines.matches(".*exerciseduration.*") || lines.matches(".*timewastedduration.*") ){
                     exerciseStats(lines);             
                 } else if(lines.replaceAll(Regex.regexIt("time"), "").length() == 13) {
                     timeOut(lines);
@@ -137,13 +137,6 @@ public class DataHandler{
     private void changeParticipant(String lines){
         participant = lines.replaceAll(Regex.regexIt("participant"), "");
     }
-
-    // /**
-    //  * This marks the end of the dataset for the participant.
-    //  */
-    // private void endOfParticipan(){
-    //     p.printEnding(new String[]{participant, "", "end", "", ""});
-    // }
 
     /**
      * This method prepares the data for the Printer class,
