@@ -1,10 +1,7 @@
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 
 public class Printer {
     private ArrayList<String[]> al;
@@ -15,11 +12,6 @@ public class Printer {
 
     public void printer(String[] data){
         al.add(data);
-    }
-
-    public String timePrinter(Date times){
-        DateFormat df = new SimpleDateFormat("dd/MM/yy HH:mm:ss");
-        return df.format(times);
     }
 
     public void printEnding(String[] data){

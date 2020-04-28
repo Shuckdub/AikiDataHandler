@@ -1,51 +1,50 @@
+import static java.lang.System.out;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 public class Printer {
     private StringBuilder sb;
 
-    public Printer(){
+    public Printer() {
         sb = new StringBuilder();
     }
 
-    public void titles(){
+    public void titles() {
         sb.append("Participant,Timestamp,event,url,value" + "\n");
     }
 
-    public void addToPrinter(String nextLines){
+    public void addToPrinter(String nextLines) {
         sb.append(nextLines + "\n");
     }
 
-    public void test(){
-        System.out.print(sb.toString());
+    public void test() {
+        out.print(sb.toString());
         sb.setLength(0);
     }
 
-    public void addLinesToPrinter(String[] lineArray, String event){
+    public void addLinesToPrinter(String[] lineArray, String event) {
         switch (event) {
             case "end":
                 lineArray[2] = "exercise-session";
                 lineArray[3] = "";
                 lineArray[4] = "ended";
-                addToPrinter(String.join(",",lineArray));
+                addToPrinter(String.join(",", lineArray));
                 break;
 
             case "interruption":
                 lineArray[2] = "exercise-was";
                 lineArray[3] = "";
-                lineArray[4] = "interrupted"; 
-                addToPrinter(String.join(",",lineArray));
+                lineArray[4] = "interrupted";
+                addToPrinter(String.join(",", lineArray));
                 break;
-            
+
             case "timeout":
                 lineArray[2] = "earned-timout-until";
                 addToPrinter(String.join(",", lineArray));
                 break;
-            
+
             case "timeout-on":
                 lineArray[2] = "user-added-a-timeout";
                 addToPrinter(String.join(",", lineArray));
@@ -68,7 +67,7 @@ public class Printer {
 
             case "user-went-to":
                 lineArray[2] = "user-went-to";
-                lineArray[4] = "";
+                lineArray[4] = " ";
                 addToPrinter(String.join(",", lineArray));
                 break;
 
@@ -95,7 +94,7 @@ public class Printer {
 
             case "blockedurls":
                 lineArray[2] = "this-is-a-time-wasting-site";
-                addToPrinter(String.join(",", lineArray));
+                addToPrinter(String.join(",", lineArray)+", ");
                 break;
 
             case "timewastedduration":
@@ -109,53 +108,48 @@ public class Printer {
         }
     }
 
-    public void printItAll(String placement, String fileName){
-        try {
-            File file = new File("./"+ placement +"/"+ fileName +".csv");
-            int i = 1;
-            while(true){
-                if(file.exists()){
-                    file = new File("./"+ placement +"/"+ fileName + "-x-" + i + ".csv");
-                    i++;
-                    continue;
-                }
-                FileWriter out = new FileWriter(file.getAbsolutePath());
-                BufferedWriter bw = new BufferedWriter(out);
-                bw.write(sb.toString());
+    public void printItAll(String placement, String fileName) {
+        File file = createFile(placement, fileName);
+        try (FileWriter output = new FileWriter(file.getAbsolutePath());
+            BufferedWriter bw = new BufferedWriter(output)) {
+            bw.write(sb.toString());
 
-                bw.close();
-
-                sb.setLength(0);
-                break;
-            }
             sb.setLength(0);
         } catch (Exception e) {
-            System.out.println("Execption occured:");
+            out.println("Execption occured:");
             e.printStackTrace();
         }
     }
 
-    public void printOneBigFile(){
+    private File createFile(String placement, String fileName) {
         try {
-            File file = new File("./userFriendlyLogData/userFriendlyLog.csv");
+            File file = new File("./" + placement + "/" + fileName + ".csv");
             int i = 1;
-            while(true){
-                if(file.exists()){
-                    file = new File("./userFriendlyLogData/userFriendlyLog" + i + ".csv");
-                    i++;
-                    continue;
+            while (true) {
+                if (!file.exists()) {
+                    break;
                 }
-                FileWriter out = new FileWriter(file.getAbsolutePath());
-                BufferedWriter bw = new BufferedWriter(out);
-                bw.write(sb.toString());
-
-                bw.close();
-
-                sb.setLength(0);
-                break;
+                file = new File("./" + placement + "/" + fileName + "-x-" + i + ".csv");
+                i++;
             }
+            return file;
         } catch (Exception e) {
-            System.out.println("Exception happened: ");
+            out.println("Execption occured:");
+            e.printStackTrace();
+        }
+        return new File("");
+    }
+
+    public void printOneBigFile() {
+        File file = createFile("userFriendlyLogData", "userFriendlyLog");
+        try(FileWriter out = new FileWriter(file.getAbsolutePath());
+            BufferedWriter bw = new BufferedWriter(out)) {
+            bw.write(sb.toString());
+
+            sb.setLength(0);
+
+        } catch (Exception e) {
+            out.println("Exception happened: ");
             e.printStackTrace();
         }
     }
