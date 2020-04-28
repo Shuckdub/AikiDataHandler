@@ -10,6 +10,7 @@ public class UserBehaviour {
     private int totalsessionSkipped = 0;
     private int totalsessionInterrupted = 0;
     private int longestSessionOverall = 0;
+    private int totalSessionLength = 0;
     private int averageLengthOverall = 0;
     private int sessionsPerDay = 0;
     private ArrayList<Integer> sessionsOnAllTheDays = new ArrayList<>();
@@ -57,19 +58,10 @@ public class UserBehaviour {
                 if(session > longestSessionOverall){
                     longestSessionOverall = session;
                 }
-                
+                totalSessionLength += session;
                 break;
             case "exercise-was":
-                if(value.equals("Succes")){
-                    totalsessionSuccesses++;
-                    totalSessions++;
-                } else if(value.equals("Skipped")){
-                    totalsessionSkipped++;
-                    totalSessions++;
-                } else {
-                    totalsessionInterrupted++;
-                    totalSessions++;
-                }
+                exerciseWas(value);
                 break;
             default:
                 break;
@@ -87,6 +79,19 @@ public class UserBehaviour {
             disabledif += diff.toDays();
         }
         wasItEnabled = true;
+    }
+
+    private void exerciseWas(String value){
+        if(value.equals("Succes")){
+            totalsessionSuccesses++;
+            totalSessions++;
+        } else if(value.equals("Skipped")){
+            totalsessionSkipped++;
+            totalSessions++;
+        } else {
+            totalsessionInterrupted++;
+            totalSessions++;
+        }
     }
 
     private void dailyStats(String time, String event, String value){
@@ -146,12 +151,15 @@ public class UserBehaviour {
         // System.out.println("Succes: " + totalsessionSuccesses);
         // System.out.println("Skipped: " + totalsessionSkipped);
         // System.out.println("Interrupted: " + totalsessionInterrupted);
-        System.out.println(data[0] + ": Disabled " + disabledif + "," + wasItDisabled + "," + wasItEnabled);
+        System.out.println("participant,total sessions,total time spent in session,longest session,successful sessions,skipped sessions,interrupted sessions,did the user disable Aiki,in the end was Aiki enabled,how many days was it disabled, first active day, last active day, total days of activity");
+        System.out.println(data[0] + "," + totalSessions + "," + totalSessionLength + "," + longestSessionOverall + "," + sessionSuccesses + "," + sessionSkipped +  "," + sessionInterrupted + "," + wasItDisabled + "," + wasItEnabled + "," +  disabledif);
         totalSessions = 0;
         totalsessionSuccesses = 0;
         totalsessionSkipped = 0;
         totalsessionInterrupted = 0;
         disabledif = 0;
         wasItDisabled = false;
+        totalSessionLength = 0;
+        longestSessionOverall = 0;
     }
 }
