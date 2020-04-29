@@ -1,7 +1,6 @@
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.List;
 
 public class UserBehaviour {
@@ -11,16 +10,10 @@ public class UserBehaviour {
     private int totalsessionInterrupted = 0;
     private int longestSessionOverall = 0;
     private int totalSessionLength = 0;
-    private int averageLengthOverall = 0;
-    private int sessionsPerDay = 0;
-    private ArrayList<Integer> sessionsOnAllTheDays = new ArrayList<>();
-    private int longestDisableTimeInDays = 0;
-    private int day = 0;
-    private int dailyTotalSessions = 0;
-    private int sessionSuccesses = 0;
-    private int sessionSkipped = 0;
-    private int sessionInterrupted = 0;
-    private int longestSession = 0;
+    private int firstDay = 0;
+    private int lastDay = 0;
+    private int lastActiveDay = 0;
+    private int activeDays = 0;
     private boolean wasItDisabled = false;
     private boolean wasItEnabled = true;
     private String disableTime;
@@ -30,13 +23,30 @@ public class UserBehaviour {
     Printer p = new Printer();
 
     public void calculate( List<String[]> data){
-        for (String[] d : data) {
-            overallStats(d);
+        for (int i = 1 ; i < data.size(); i++) {
+            overallStats(data.get(i));
+        }
+        lastDay = Integer.parseInt(data.get(data.size()-1)[1].substring(0,2));
+        if(lastDay != lastActiveDay){
+            activeDays++;
         }
         summarizeTotal(data.get(1));
     }
 
     private void overallStats(String[] data){
+        int date = Integer.parseInt(data[1].substring(0, 2));
+        if(firstDay == 0 ){
+            firstDay = date;
+            lastActiveDay = date;
+            activeDays++;
+        } else {
+            if(lastActiveDay < date){
+                lastActiveDay = date;
+                activeDays++;
+            }
+        }
+
+
         String event = data[2];
         String value = data[4];
         switch (event) {
@@ -94,72 +104,32 @@ public class UserBehaviour {
         }
     }
 
-    private void dailyStats(String time, String event, String value){
-        int currentDay = Integer.parseInt(time.substring(0, 2));
-        System.out.println(currentDay);
-        if(day == 0){
-            day = currentDay;
-        }
-        if(day < currentDay){
-            while(day < currentDay){
-                day++;
-                summarizeDaily();
-            }
-        }
-        switch (event) {
-            case "intercepts":
-                           
-                break;
-            case "enabled":
-
-                break;
-            case "zeeguu":
-                int session = Integer.parseInt(value);
-                if(session > longestSession){
-                    longestSession = session;
-                }
-                break;
-            case "exercisestatus":
-                if(value.equals("Succes")){
-                    sessionSuccesses++;
-                    dailyTotalSessions++;
-                } else if(value.equals("Skipped")){
-                    sessionSkipped++;
-                    dailyTotalSessions++;
-                } else {
-                    sessionInterrupted++;
-                    dailyTotalSessions++;
-                }
-                break;
-            default:
-                break;
-        }
-    }
-    public void summarizeDaily(){
-        System.out.print("Total: " + dailyTotalSessions + ",");
-        System.out.print("Succes: " + sessionSuccesses + ",");
-        System.out.print("Skipped: " + sessionSkipped + ",");
-        System.out.println("Interrupted: " + sessionInterrupted + ",");
-        dailyTotalSessions = 0;
-        sessionSuccesses = 0;
-        sessionSkipped = 0;
-        sessionInterrupted = 0;
-    }
-
     public void summarizeTotal(String[] data){
-        // System.out.println("Total: " + totalSessions);
-        // System.out.println("Succes: " + totalsessionSuccesses);
-        // System.out.println("Skipped: " + totalsessionSkipped);
-        // System.out.println("Interrupted: " + totalsessionInterrupted);
-        System.out.println("participant,total sessions,total time spent in session,longest session,successful sessions,skipped sessions,interrupted sessions,did the user disable Aiki,in the end was Aiki enabled,how many days was it disabled, first active day, last active day, total days of activity");
-        System.out.println(data[0] + "," + totalSessions + "," + totalSessionLength + "," + longestSessionOverall + "," + sessionSuccesses + "," + sessionSkipped +  "," + sessionInterrupted + "," + wasItDisabled + "," + wasItEnabled + "," +  disabledif);
+        // System.out.print("Total: " + totalSessions);
+        // System.out.print(data[0] + ", Total spent in sessions: " + totalSessionLength);
+        System.out.print(data[0] + ", Longest session " + longestSessionOverall);
+        // System.out.print(", Succes: " + totalsessionSuccesses);
+        // System.out.print(", Skipped: " + totalsessionSkipped);
+        // System.out.print(", Interrupted: " + totalsessionInterrupted);
+        // System.out.print(", Did the user disable Aiki? " + wasItDisabled);
+        // System.out.print(", Was Aiki enabled in the end? " + wasItEnabled);
+        System.out.println();
+        // System.out.println("participant,total sessions,total time spent in session,longest session,successful sessions,skipped sessions,interrupted sessions,did the user disable Aiki,in the end was Aiki enabled,how many days was it disabled, first active day, last active day, total days of activity");
+        // System.out.println(data[0] + "," + totalSessions + "," + totalSessionLength + "," + longestSessionOverall + "," + totalsessionSuccesses + "," + totalsessionSkipped +  "," + totalsessionInterrupted + "," + wasItDisabled + "," + wasItEnabled + "," +  disabledif);
+        resetForNextParticipant();
+    }
+
+    private void resetForNextParticipant(){
         totalSessions = 0;
         totalsessionSuccesses = 0;
         totalsessionSkipped = 0;
         totalsessionInterrupted = 0;
-        disabledif = 0;
-        wasItDisabled = false;
-        totalSessionLength = 0;
         longestSessionOverall = 0;
+        totalSessionLength = 0;
+        firstDay = 0;
+        wasItDisabled = false;
+        wasItEnabled = true;
+        disableTime = "";
+        disabledif = 0;
     }
 }
