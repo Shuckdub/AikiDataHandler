@@ -28,24 +28,15 @@ public class DataHandler{
     public void startTheDataHandler(File file, boolean lastFile){
         try{
             sc = new Scanner(file);
+            String lines = sc.nextLine();
             while(sc.hasNext()){
-                String lines = sc.nextLine();
-                if(lines.length() > 60) {
-                    changeParticipant(lines);
-                    while(sc.hasNext()){
-                        String newParticipant = lines.replaceAll(Regex.regexIt("participant"), "");
-                        if(newParticipant.length() > 59) {
-                            changeParticipant(newParticipant);
-                        }
-                        lines = sc.nextLine();
-                        if(!lines.matches(".*collections.*")){
-                            theParticipantsActivity(lines);
-                        } else if (lines.matches(".*collections.*")){
-                            // endOfParticipan();
-                        } else {
-                            continue;
-                        }
-                    }
+                String newParticipant = lines.replaceAll(Regex.regexIt("participant"), "");
+                if(newParticipant.length() > 55) {
+                    changeParticipant(newParticipant);
+                }
+                lines = sc.nextLine();
+                if(!lines.matches(".*collections.*")){
+                    theParticipantsActivity(lines);
                 }
             }
             if(lastFile){
@@ -82,7 +73,7 @@ public class DataHandler{
                     enabled(lines);
                 }else {
                     event = lines.replaceAll(Regex.regexIt("event"), "");
-                    eventHandling(lines);
+                    eventHandling();
                 }
             }
         }
@@ -93,16 +84,15 @@ public class DataHandler{
      * activity returns an array of tasks.
      * @param lines
      */
-    private void eventHandling(String lines){
+    private void eventHandling(){
         while(sc.hasNext()){
-            lines = sc.nextLine();
+            String lines = sc.nextLine();
             if(lines.matches(".*},.*") || lines.matches(".*].*")){
                 return;
             } else if(lines.matches(".*}.*")){
                 if(lines.matches(".*},.*")){
                     return;
                 }
-                continue;
             }else if(event.equals("blockedurls")){
                 blockedurls(lines);
             } else {
@@ -159,8 +149,7 @@ public class DataHandler{
 
     private Date timeConverter(String times){
         Long convertedTime = Long.parseLong(times);
-        Date currentDate = new Date(convertedTime);
-        return currentDate;
+        return new Date(convertedTime);
     }
 
     /**

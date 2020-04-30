@@ -140,8 +140,8 @@ public class Printer {
         return new File("");
     }
 
-    public void printOneBigFile() {
-        File file = createFile("userFriendlyLogData", "userFriendlyLog");
+    public void printOneBigFile(String placement, String fileName) {
+        File file = createFile(placement, fileName);
         try(FileWriter out = new FileWriter(file.getAbsolutePath());
             BufferedWriter bw = new BufferedWriter(out)) {
             bw.write(sb.toString());

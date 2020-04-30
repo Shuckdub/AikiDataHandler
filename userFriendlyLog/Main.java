@@ -9,27 +9,42 @@ public class Main {
     public static void main(String[] args){
         List<File> csvFiles = covertEachParticipantIntoSessions("data");
 
-        // Participants t = new Participants();
-        // for (File file : csvFiles) {  
-        //     t.createParticipants(loadTheFile(file));
-        // }
+        Participants t = new Participants();
+        for (File file : csvFiles) {  
+            t.createParticipants(loadTheFile(file));
+        }
         
-        // csvFiles.clear();
+        csvFiles.clear();
 
-        // Sessions s = new Sessions();
-        // csvFiles = covertEachParticipantIntoSessions("output");
-        // for (File file : csvFiles) {  
-        //     s.createSessions(loadTheFile(file));
-        // }
+        csvFiles = covertEachParticipantIntoSessions("output");
+        for(File file : csvFiles){
+            length(loadTheFile(file));
+        }
+
+        Sessions s = new Sessions();
+        csvFiles = covertEachParticipantIntoSessions("output");
+        for (File file : csvFiles) {  
+            s.createSessions(loadTheFile(file));
+        }
 
         csvFiles.clear();
 
         UserBehaviour b = new UserBehaviour();
+        b.addTitles();
         csvFiles = covertEachParticipantIntoSessions("userFriendlyLogData");
         for (File file : csvFiles) {  
             b.calculate(loadTheFile(file));
         }
+        b.printOneFile("output2", "statistics");
         
+    }
+
+    private static void length(List<String[]> data){
+        for(String[] d: data){
+            if(d.length < 5){
+                System.out.println(String.join(",", d));
+            }
+        }
     }
 
     private static List<File> covertEachParticipantIntoSessions(String placement){

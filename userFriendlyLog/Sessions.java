@@ -99,7 +99,7 @@ public class Sessions {
             i++;
             while(i < data.size()){
                 String[] nextLineArray = data.get(i);
-                if(nextLineArray[4].equals("closed")) {
+                if(!(nextLineArray[4].matches("-?\\d+"))) {
                     return i;
                 } else if(nextLineArray[1].equals(lineArray[1])){
                     currentInterception.put(nextLineArray[3],Integer.parseInt(nextLineArray[4]));

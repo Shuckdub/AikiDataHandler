@@ -30,7 +30,11 @@ public class Participants {
     private void prepareToPrint(ArrayList<String[]> participantData, String placement){
         p.titles();
         for (String[] data : participantData) {
-            p.addToPrinter(String.join(",", data));
+            if(data[2].equals("blockedurls")){
+                p.addToPrinter(String.join(",", data) + ", ");
+            } else {
+                p.addToPrinter(String.join(",", data));
+            }
         }
         p.printItAll(placement,participantData.get(0)[0]);
     }
