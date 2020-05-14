@@ -223,7 +223,7 @@ public class DataHandler{
     }
 
     public String timePrinter(Date times){
-        DateFormat df = new SimpleDateFormat("dd/MM/yy HH:mm:ss");
+        DateFormat df = new SimpleDateFormat("yy/MM/dd HH:mm:ss");
         return df.format(times);
     }
 }

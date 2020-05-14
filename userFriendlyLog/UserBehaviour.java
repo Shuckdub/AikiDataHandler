@@ -15,7 +15,10 @@ public class UserBehaviour {
     private int firstDay = 0;
     private int lastDay = 0;
     private int lastActiveDay = 0;
+    private int lastActiveMonth = 0;
     private int activeDays = 0;
+    private String outsideOfStudy = "-1";
+    private boolean endLoop = false;
     private boolean wasItDisabled = false;
     private boolean wasItEnabled = true;
     private String disableTime = "-1";
@@ -38,25 +41,29 @@ public class UserBehaviour {
     public void calculate( List<String[]> data){
         participant = data.get(1)[0];
         for (int i = 1 ; i < data.size(); i++) {
+            if(daysPast(data.get(i))){
+                endLoop = true;
+                break;
+            }
             overallStats(data.get(i));
         }
         lastDay = Integer.parseInt(data.get(data.size()-1)[1].substring(0,2));
-        if(lastDay != lastActiveDay){
+        if(lastDay > lastActiveDay && !endLoop){
             activeDays++;
         }
         summarizeTotal();
     }
 
     private void overallStats(String[] data){
-        int date = Integer.parseInt(data[1].substring(0, 2));
-        getActiveDays(date);
+        int month = Integer.parseInt(data[1].substring(3, 5));
+        int day = Integer.parseInt(data[1].substring(6, 8));
+        
+        getActiveDays(month, day);
+
 
         String event = data[2];
         String value = data[4];
         switch (event) {
-            case "intercepts":
-                           
-                break;
             case "extension-was":
                 if(value.equals("enabled")){
                     enabled(data);
@@ -82,30 +89,51 @@ public class UserBehaviour {
         }
     }
 
-    private void getActiveDays(int date){
+    private void getActiveDays(int month, int day){
         if(firstDay == 0 ){
-            firstDay = date;
-            lastActiveDay = date;
+            firstDay = day;
+            lastActiveDay = day;
             activeDays++;
         } else {
-            if(lastActiveDay < date){
-                lastActiveDay = date;
+            if(lastActiveMonth < month){
+                lastActiveMonth = month;
+                lastActiveDay = day;
+                activeDays++;
+            } else if(lastActiveDay < day){
+                lastActiveDay = day;
                 activeDays++;
             }
         }
     }
 
     private void enabled(String[] data){
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yy HH:mm:ss");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yy/MM/dd HH:mm:ss");
         LocalDate d1 = LocalDate.parse(disableTime, formatter);
         LocalDate d2 = LocalDate.parse(data[1], formatter);
         Duration diff = Duration.between(d1.atStartOfDay(), d2.atStartOfDay());
-        if(disabledif == 0 ){
+    
+        if(disabledif == 0){
             disabledif = diff.toDays();
         } else {
             disabledif += diff.toDays();
         }
         wasItEnabled = true;
+    }
+
+    private boolean daysPast(String[] data){
+        if(firstDay != 0 ){
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yy/MM/dd HH:mm:ss");
+            LocalDate d1 = LocalDate.parse(outsideOfStudy, formatter);
+            LocalDate d2 = LocalDate.parse(data[1], formatter);
+            Duration diff = Duration.between(d1.atStartOfDay(), d2.atStartOfDay());
+            if(diff.toDays() > 14){
+                return true;
+            }
+        } else{
+            outsideOfStudy = data[1];
+            return false;
+        }
+        return false;
     }
 
     private void exerciseWas(String value){
