@@ -169,9 +169,9 @@ public class UserBehaviour {
                 + "," + totalSessions
                 + "," + formatTotalSession 
                 + "," + formatLongest 
-                + "," + totalsessionInterrupted 
+                + "," + totalsessionSuccesses 
                 + "," + totalsessionSkipped 
-                + "," + totalsessionSuccesses
+                + "," + totalsessionInterrupted
                 + "," + wasItDisabled 
                 + "," + wasItEnabled
                 + "," + disabledif 
