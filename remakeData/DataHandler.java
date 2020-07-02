@@ -1,5 +1,7 @@
 import java.io.File;
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Scanner;
 
@@ -23,30 +25,18 @@ public class DataHandler{
     static Printer p = new Printer();
 
 
-    public void startTheDataHandler(File file, boolean firstFile, boolean lastFile){
+    public void startTheDataHandler(File file, boolean lastFile){
         try{
             sc = new Scanner(file);
+            String lines = sc.nextLine();
             while(sc.hasNext()){
-                String lines = sc.nextLine();
-                if(lines.length() > 60) {
-                    if(firstFile){
-                        p.printTitle();
-                    }
-                    changeParticipant(lines);
-                    while(sc.hasNext()){
-                        String newParticipant = lines.replaceAll(Regex.regexIt("participant"), "");
-                        if(newParticipant.length() > 59) {
-                            changeParticipant(newParticipant);
-                        }
-                        lines = sc.nextLine();
-                        if(!lines.matches(".*collections.*")){
-                            theParticipantsActivity(lines);
-                        } else if (lines.matches(".*collections.*")){
-                            endOfParticipan();
-                        } else {
-                            continue;
-                        }
-                    }
+                String newParticipant = lines.replaceAll(Regex.regexIt("participant"), "");
+                if(newParticipant.length() > 55) {
+                    changeParticipant(newParticipant);
+                }
+                lines = sc.nextLine();
+                if(!lines.matches(".*collections.*")){
+                    theParticipantsActivity(lines);
                 }
             }
             if(lastFile){
@@ -75,7 +65,7 @@ public class DataHandler{
                 exerciseSuccessOrFailure(lines);
             } else {
                 lines = sc.nextLine().toLowerCase();
-                if(lines.matches(".*zeeguu.*") || lines.matches(".*exerciseduration.*") ){
+                if(lines.matches(".*zeeguu.*") || lines.matches(".*exerciseduration.*") || lines.matches(".*timewastedduration.*") ){
                     exerciseStats(lines);             
                 } else if(lines.replaceAll(Regex.regexIt("time"), "").length() == 13) {
                     timeOut(lines);
@@ -83,7 +73,7 @@ public class DataHandler{
                     enabled(lines);
                 }else {
                     event = lines.replaceAll(Regex.regexIt("event"), "");
-                    eventHandling(lines);
+                    eventHandling();
                 }
             }
         }
@@ -94,16 +84,15 @@ public class DataHandler{
      * activity returns an array of tasks.
      * @param lines
      */
-    private void eventHandling(String lines){
+    private void eventHandling(){
         while(sc.hasNext()){
-            lines = sc.nextLine();
+            String lines = sc.nextLine();
             if(lines.matches(".*},.*") || lines.matches(".*].*")){
                 return;
             } else if(lines.matches(".*}.*")){
                 if(lines.matches(".*},.*")){
                     return;
                 }
-                continue;
             }else if(event.equals("blockedurls")){
                 blockedurls(lines);
             } else {
@@ -142,13 +131,6 @@ public class DataHandler{
     }
 
     /**
-     * This marks the end of the dataset for the participant.
-     */
-    private void endOfParticipan(){
-        p.printEnding(participant, "", "end", "", "");
-    }
-
-    /**
      * This method prepares the data for the Printer class,
      * when the user somehow turned the timeout on or off.
      * @param lines
@@ -158,17 +140,16 @@ public class DataHandler{
         Date timeout = timeConverter(lines.replaceAll(Regex.regexIt("time"), ""));
         if(time.compareTo(timeout) < 0) {
             event = "timeout-on";
-            p.printer(participant, time, event, url, p.timePrinter(timeout));
+            p.printer(new String[]{participant, timePrinter(time), event, url, timePrinter(timeout)});
         } else {
             event = "timeout-off";
-            p.printer(participant, time, event, url, p.timePrinter(timeout));
+            p.printer(new String[]{participant, timePrinter(time), event, url, timePrinter(timeout)});
         }
     }
 
     private Date timeConverter(String times){
         Long convertedTime = Long.parseLong(times);
-        Date currentDate = new Date(convertedTime);
-        return currentDate;
+        return new Date(convertedTime);
     }
 
     /**
@@ -181,7 +162,7 @@ public class DataHandler{
         event = lines.replaceAll(Regex.regexIt("event"), "").substring(0, 7);
         String value = lines.replaceAll(Regex.regexIt("event"), "").substring(7);
         url = "";
-        p.printer(participant, time, event, url, value);
+        p.printer(new String[]{participant, timePrinter(time), event, url, value});
     }
 
     /**
@@ -193,7 +174,7 @@ public class DataHandler{
         String value = lines.replaceAll(Regex.regexIt("event"), "");
         event = "exercisestatus";
         url = "";
-        p.printer(participant,time,event,url,value);
+        p.printer(new String[]{participant, timePrinter(time), event, url, value});
     }
 
     /**
@@ -205,7 +186,7 @@ public class DataHandler{
         event = lines.replaceAll(Regex.regexIt("event"), "");
         url = "";
         String value = lines.replaceAll(Regex.regexIt("time"), "");
-        p.printer(participant, time, event, url, value);
+        p.printer(new String[]{participant, timePrinter(time), event, url, value});
     }
 
     /**
@@ -216,7 +197,7 @@ public class DataHandler{
     private void prepIntercepts(String lines){
         url = lines.replaceAll(Regex.regexIt("url"), "");
         String value = lines.replaceAll(Regex.regexIt("time"), "");
-        p.printer(participant, time, event, url, value);
+        p.printer(new String[]{participant, timePrinter(time), event, url, value});
     }
 
     /**
@@ -227,7 +208,7 @@ public class DataHandler{
     private void prepBlockedUrls(String lines){
         url = lines.replaceAll(Regex.regexIt("url"), "");
         url = url.substring(8);
-        p.printer(participant, time, event, url, "");
+        p.printer(new String[]{participant, timePrinter(time), event, url, ""});
     }
     
     /**
@@ -238,6 +219,11 @@ public class DataHandler{
     private void closedTheInterception(){
         event = "intercepted";
         url = "";
-        p.printer(participant, time, event, url, "closed");
+        p.printer(new String[]{participant, timePrinter(time), event, url, "closed"});
+    }
+
+    public String timePrinter(Date times){
+        DateFormat df = new SimpleDateFormat("yy/MM/dd HH:mm:ss");
+        return df.format(times);
     }
 }

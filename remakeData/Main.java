@@ -6,7 +6,6 @@ public class Main {
     public static void main(String[] args){
         final File folder = new File("./data");
         final List<File> fileList = Arrays.asList(folder.listFiles());
-        boolean firstFile = true;
         boolean lastFile = false;
 
         for (int i = 0; i < fileList.size(); i++) {
@@ -16,8 +15,7 @@ public class Main {
               lastFile = true;  
             }
             if(file.isFile() && file.getName().endsWith(".json")){
-                d.startTheDataHandler(file, firstFile, lastFile);
-                firstFile = false;
+                d.startTheDataHandler(file, lastFile);
             }
         }
     }
